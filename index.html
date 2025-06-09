@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análisis de Fútbol - Juan Antonio Morales</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1><i class="fas fa-futbol"></i> Análisis de Fútbol <i class="fas fa-chart-line"></i></h1>
+            <p class="analyst-name">Por Juan Antonio Morales</p>
+        </div>
+        <nav>
+            <ul class="nav-links">
+                <li><a href="#" id="nav-home"><i class="fas fa-home"></i> Inicio</a></li>
+                <li><a href="#" id="nav-data"><i class="fas fa-database"></i> Gestión de Datos</a></li>
+                <li><a href="#" id="nav-analysis"><i class="fas fa-chart-bar"></i> Análisis</a></li>
+                <li id="logout-button-container" style="display:none;"><a href="#" id="logout-button"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a></li>
+            </ul>
+            <div class="menu-toggle">
+                <i class="fas fa-bars"></i>
+            </div>
+        </nav>
+    </header>
+
+    <main id="content-section">
+        <section id="login-section" class="auth-section">
+            <h2>Iniciar Sesión</h2>
+            <form id="login-form">
+                <label for="login-email">Correo Electrónico:</label>
+                <input type="email" id="login-email" required autocomplete="username">
+
+                <label for="login-password">Contraseña:</label>
+                <input type="password" id="login-password" required autocomplete="current-password">
+
+                <button type="submit" class="button-primary">Entrar</button>
+                <p id="login-error-message" class="error-message" style="display:none;"></p>
+            </form>
+        </section>
+
+        <section id="app-content" style="display:none;">
+
+            <div id="home-summary-section" style="display:none;">
+                <h2>Resumen de la Base de Datos</h2>
+                <div class="summary-grid">
+                    <div class="summary-card">
+                        <h3>Equipos</h3>
+                        <p id="summary-equipos">Cargando...</p>
+                    </div>
+                    <div class="summary-card">
+                        <h3>Jugadores</h3>
+                        <p id="summary-jugadores">Cargando...</p>
+                    </div>
+                    <div class="summary-card">
+                        <h3>Partidos</h3>
+                        <p id="summary-partidos">Cargando...</p>
+                    </div>
+                    <div class="summary-card">
+                        <h3>Acciones</h3>
+                        <p id="summary-acciones">Cargando...</p>
+                    </div>
+                    <div class="summary-card">
+                        <h3>Tipos de Juego</h3>
+                        <p id="summary-tiposdejuego">Cargando...</p>
+                    </div>
+                    <div class="summary-card">
+                        <h3>Entrenadores</h3>
+                        <p id="summary-entrenadores">Cargando...</p>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="summaryChart"></canvas>
+                </div>
+            </div>
+
+            <div id="data-management-section" style="display:none;">
+                <h2>Gestión de Datos</h2>
+                <div class="controls">
+                    <label for="data-select">Selecciona una tabla:</label>
+                    <select id="data-select">
+                        <option value="">-- Selecciona --</option>
+                        <option value="equipos">Equipos</option>
+                        <option value="jugadores">Jugadores</option>
+                        <option value="partidos">Partidos</option>
+                        <option value="acciones">Acciones</option>
+                        <option value="tiposdejuego">Tipos de Juego</option>
+                        <option value="entrenadores">Entrenadores</option>
+                        </select>
+                </div>
+
+                <div id="form-container">
+                    </div>
+
+                <div id="data-list-container">
+                    </div>
+            </div>
+
+           <div id="analysis-section" style="display:none;">
+                <h2>Análisis</h2>
+                <p class="analysis-intro">Explora los datos mediante diferentes tipos de análisis.</p>
+                <div class="analysis-options">
+                    <button class="analysis-button" id="show-field-map">Mapa de Campo (Acciones)</button>
+                    <button class="analysis-button" id="show-goals-by-player-chart">Goles por Jugador</button>
+                    </div>
+
+                <p id="analysis-message" class="info-message" style="display:block;"></p>
+
+                <div class="chart-area" style="display:none;">
+                    <canvas id="myChart"></canvas>
+                </div>
+
+                <div id="field-map-container" style="display:none; text-align: center; margin-top: 20px;">
+                    <h3>Coordenadas de Acciones en el Campo</h3>
+                    <canvas id="football-field" width="800" height="500" style="border:1px solid #d3d3d3; background-color: #588f27;"></canvas>
+                    <div class="field-data-input">
+                        <form id="field-data-form">
+                            <label for="field-x">X (0-100):</label>
+                            <input type="number" id="field-x" min="0" max="100" step="0.1" readonly>
+                            <label for="field-y">Y (0-100):</label>
+                            <input type="number" id="field-y" min="0" max="100" step="0.1" readonly>
+                            <label for="action-type">Tipo de Acción:</label>
+                            <select id="action-type" required>
+                                <option value="">Selecciona un tipo</option>
+                                <option value="Tiro a Puerta">Tiro a Puerta</option>
+                                <option value="Tiro fuera">Tiro Fuera</option>
+                                <option value="Pase Clave">Pase Clave</option>
+                                <option value="Recuperación">Recuperación</option>
+                                <option value="Falta">Falta</option>
+                                <option value="Gol">Gol</option> </select>
+                            <label for="action-player">Jugador (ID):</label>
+                            <input type="number" id="action-player" placeholder="ID del Jugador">
+                            <button type="submit" class="button-primary">Guardar Acción</button>
+                            <p id="field-form-message" class="error-message" style="display:none;"></p>
+                        </form>
+                    </div>
+
+                </div>
+
+            </div>
+            
+
+        </section>
+    </main>
+
+    <footer>
+        <p><i class="far fa-copyright"></i> 2025 Análisis de Fútbol. Desarrollado por Juan Antonio Morales.</p>
+    </footer>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+
+    <script src="firebase-config.js"></script>
+    <script src="auth.js"></script>
+    <script src="data-management.js"></script>
+    <script src="home-summary.js"></script>
+    <script src="analysis.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
