@@ -38,6 +38,7 @@ logoutButton.addEventListener('click', (e) => {
         if (navElement) navElement.classList.add('hidden-menu');
         if (navLinksElement) navLinksElement.classList.add('hidden-menu');
         if (navLinksElement) navLinksElement.classList.remove('active');
+        if (navLinksElement) navLinksElement.classList.add('debug-menu-hidden-state');
         loginSection.style.display = 'block';
         logoutButtonContainer.style.display = 'none';
         loginForm.reset(); // Limpia el formulario de login
@@ -75,6 +76,7 @@ auth.onAuthStateChanged((user) => {
         if (navElement) navElement.classList.add('hidden-menu');
         if (navLinksElement) navLinksElement.classList.add('hidden-menu');
         if (navLinksElement) navLinksElement.classList.remove('active');
+        if (navLinksElement) navLinksElement.classList.add('debug-menu-hidden-state');
         console.log('No hay usuario logueado');
     }
 });
