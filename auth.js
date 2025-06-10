@@ -5,6 +5,7 @@ const contentSection = document.getElementById('app-content'); // Ahora apunta a
 const logoutButtonContainer = document.getElementById('logout-button-container');
 const logoutButton = document.getElementById('logout-button');
 const loginErrorMessage = document.getElementById('login-error-message');
+const navElement = document.querySelector('header nav');
 
 
 // Manejar el inicio de sesión
@@ -33,6 +34,7 @@ logoutButton.addEventListener('click', (e) => {
         console.log('Usuario ha cerrado sesión');
         // Oculta el contenido principal y muestra la sección de login
         contentSection.style.display = 'none';
+        if (navElement) navElement.style.display = 'none';
         loginSection.style.display = 'block';
         logoutButtonContainer.style.display = 'none';
         loginForm.reset(); // Limpia el formulario de login
@@ -59,12 +61,14 @@ auth.onAuthStateChanged((user) => {
         if (typeof loadSummaryData === 'function') { // Asegúrate de que la función exista
             loadSummaryData();
         }
+        if (navElement) navElement.style.display = 'block';
 
     } else {
         // Usuario no logueado
         loginSection.style.display = 'block';
         contentSection.style.display = 'none';
         logoutButtonContainer.style.display = 'none';
+        if (navElement) navElement.style.display = 'none';
         console.log('No hay usuario logueado');
     }
 });
