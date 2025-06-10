@@ -673,3 +673,7 @@ footer .far {
         grid-template-columns: 1fr;
     }
 }
+
+.hidden-menu {
+    display: none !important;
+}
