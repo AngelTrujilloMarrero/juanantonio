@@ -64,3 +64,35 @@ menuToggle.addEventListener('click', () => {
 
 // Inicialmente, oculta todas las secciones de contenido hasta que el usuario inicie sesión
 hideAllContentSections();
+
+// Firebase auth state observer for main.js
+// This ensures that content visibility specific to main.js (like home summary)
+// is handled correctly based on authentication state.
+auth.onAuthStateChanged(user => {
+    if (user) {
+        // User is logged in
+        // Show default content, e.g., home summary.
+        // hideAllContentSections is important to ensure a clean state.
+        hideAllContentSections();
+        if (homeSummarySection) {
+            homeSummarySection.style.display = 'block';
+        }
+        // Load data for the home summary if the function is available
+        if (typeof loadSummaryData === 'function') {
+            loadSummaryData();
+        }
+        // Ensure nav links are not stuck in 'active' state from mobile view
+        if (navLinks) {
+            navLinks.classList.remove('active');
+        }
+    } else {
+        // User is logged out
+        // Ensure all main content sections are hidden.
+        // auth.js handles showing the login form.
+        hideAllContentSections();
+        // Ensure nav links are not stuck in 'active' state from mobile view
+        if (navLinks) {
+            navLinks.classList.remove('active');
+        }
+    }
+});
