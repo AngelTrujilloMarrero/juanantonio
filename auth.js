@@ -5,7 +5,7 @@ const contentSection = document.getElementById('app-content'); // Ahora apunta a
 const logoutButtonContainer = document.getElementById('logout-button-container');
 const logoutButton = document.getElementById('logout-button');
 const loginErrorMessage = document.getElementById('login-error-message');
-
+const mainNav = document.getElementById('main-nav'); // Added this line
 
 // Manejar el inicio de sesión
 loginForm.addEventListener('submit', (e) => {
@@ -35,6 +35,9 @@ logoutButton.addEventListener('click', (e) => {
         contentSection.style.display = 'none';
         loginSection.style.display = 'block';
         logoutButtonContainer.style.display = 'none';
+        if (mainNav) { // Added this block
+            mainNav.style.display = 'none';
+        }
         loginForm.reset(); // Limpia el formulario de login
         loginErrorMessage.style.display = 'none'; // Oculta mensajes de error anteriores
         hideAllContentSections(); // Asegura que todas las secciones de contenido estén ocultas
@@ -48,6 +51,9 @@ auth.onAuthStateChanged((user) => {
         loginSection.style.display = 'none';
         contentSection.style.display = 'block';
         logoutButtonContainer.style.display = 'block';
+        if (mainNav) { // Added this block
+            mainNav.style.display = 'block';
+        }
         console.log('Usuario actual:', user.email);
         loginErrorMessage.style.display = 'none'; // Oculta cualquier mensaje de error si el login es exitoso
 
@@ -65,6 +71,9 @@ auth.onAuthStateChanged((user) => {
         loginSection.style.display = 'block';
         contentSection.style.display = 'none';
         logoutButtonContainer.style.display = 'none';
+        if (mainNav) { // Added this block
+            mainNav.style.display = 'none';
+        }
         console.log('No hay usuario logueado');
     }
 });
