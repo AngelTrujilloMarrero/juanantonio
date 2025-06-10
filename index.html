@@ -67,10 +67,6 @@
                         <h3>Tipos de Juego</h3>
                         <p id="summary-tiposdejuego">Cargando...</p>
                     </div>
-                    <div class="summary-card">
-                        <h3>Entrenadores</h3>
-                        <p id="summary-entrenadores">Cargando...</p>
-                    </div>
                 </div>
                 <div class="chart-container">
                     <canvas id="summaryChart"></canvas>
@@ -88,7 +84,6 @@
                         <option value="partidos">Partidos</option>
                         <option value="acciones">Acciones</option>
                         <option value="tiposdejuego">Tipos de Juego</option>
-                        <option value="entrenadores">Entrenadores</option>
                         </select>
                 </div>
 
@@ -105,9 +100,21 @@
                 <div class="analysis-options">
                     <button class="analysis-button" id="show-field-map">Mapa de Campo (Acciones)</button>
                     <button class="analysis-button" id="show-goals-by-player-chart">Goles por Jugador</button>
+                    <!-- New Buttons Start -->
+                    <button class="analysis-button" id="show-actions-per-player-chart">Acciones por Jugador</button>
+                    <button class="analysis-button" id="show-action-types-per-player-chart">Tipos de Acción por Jugador</button>
+                    <button class="analysis-button" id="show-goals-per-match-chart">Goles por Partido</button>
+                    <!-- New Buttons End -->
                     </div>
 
                 <p id="analysis-message" class="info-message" style="display:block;"></p>
+
+                <div id="player-selection-area" style="display:none; margin-bottom: 20px; text-align: center;">
+                    <label for="analysis-player-select">Selecciona un Jugador:</label>
+                    <select id="analysis-player-select">
+                        <option value="">-- Cargando Jugadores --</option>
+                    </select>
+                </div>
 
                 <div class="chart-area" style="display:none;">
                     <canvas id="myChart"></canvas>

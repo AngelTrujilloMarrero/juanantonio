@@ -4,7 +4,6 @@ const summaryJugadores = document.getElementById('summary-jugadores');
 const summaryPartidos = document.getElementById('summary-partidos');
 const summaryAcciones = document.getElementById('summary-acciones');
 const summaryTiposDeJuego = document.getElementById('summary-tiposdejuego');
-const summaryEntrenadores = document.getElementById('summary-entrenadores');
 const summaryChartCanvas = document.getElementById('summaryChart');
 
 let summaryChartInstance = null; // Para la instancia del gráfico de resumen
@@ -34,46 +33,41 @@ async function loadSummaryData() {
     summaryPartidos.textContent = 'Cargando...';
     summaryAcciones.textContent = 'Cargando...';
     summaryTiposDeJuego.textContent = 'Cargando...';
-    summaryEntrenadores.textContent = 'Cargando...';
 
     const equiposCount = await getCollectionCount('equipos');
     const jugadoresCount = await getCollectionCount('jugadores');
     const partidosCount = await getCollectionCount('partidos');
     const accionesCount = await getCollectionCount('acciones');
     const tiposDeJuegoCount = await getCollectionCount('tiposdejuego');
-    const entrenadoresCount = await getCollectionCount('entrenadores');
 
     summaryEquipos.textContent = equiposCount;
     summaryJugadores.textContent = jugadoresCount;
     summaryPartidos.textContent = partidosCount;
     summaryAcciones.textContent = accionesCount;
     summaryTiposDeJuego.textContent = tiposDeJuegoCount;
-    summaryEntrenadores.textContent = entrenadoresCount;
 
     // Generar un gráfico de barras simple con los recuentos
     const ctx = summaryChartCanvas.getContext('2d');
     summaryChartInstance = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: ['Equipos', 'Jugadores', 'Partidos', 'Acciones', 'Tipos de Juego', 'Entrenadores'],
+            labels: ['Equipos', 'Jugadores', 'Partidos', 'Acciones', 'Tipos de Juego'],
             datasets: [{
                 label: 'Número de Registros',
-                data: [equiposCount, jugadoresCount, partidosCount, accionesCount, tiposDeJuegoCount, entrenadoresCount],
+                data: [equiposCount, jugadoresCount, partidosCount, accionesCount, tiposDeJuegoCount],
                 backgroundColor: [
                     'rgba(52, 152, 219, 0.8)', // Blue
                     'rgba(46, 204, 113, 0.8)', // Green
                     'rgba(241, 196, 15, 0.8)',  // Yellow
                     'rgba(231, 76, 60, 0.8)',   // Red
-                    'rgba(155, 89, 182, 0.8)', // Purple
-                    'rgba(230, 126, 34, 0.8)'   // Orange
+                    'rgba(155, 89, 182, 0.8)' // Purple
                 ],
                 borderColor: [
                     'rgba(52, 152, 219, 1)',
                     'rgba(46, 204, 113, 1)',
                     'rgba(241, 196, 15, 1)',
                     'rgba(231, 76, 60, 1)',
-                    'rgba(155, 89, 182, 1)',
-                    'rgba(230, 126, 34, 1)'
+                    'rgba(155, 89, 182, 1)'
                 ],
                 borderWidth: 1
             }]

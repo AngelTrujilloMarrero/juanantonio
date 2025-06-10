@@ -183,7 +183,7 @@ nav ul li a .fas {
 
 /* Logout Button Container */
 #logout-button-container {
-    margin-left: auto; /* Push logout button to the right */
+    /* margin-left: auto; */ /* Push logout button to the right - Removed for centering all nav items */
 }
 
 /* Footer */

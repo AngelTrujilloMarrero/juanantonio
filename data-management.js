@@ -285,19 +285,50 @@ async function displayData(tableName) {
         }
 
         const dataArray = Object.values(data); // Convertir el objeto de Firebase en un array
-        const headers = Object.keys(dataArray[0]);
+
+        let teamsMap = {};
+        if (tableName === 'partidos') {
+            const teamsSnapshot = await database.ref('equipos').once('value');
+            const teamsData = teamsSnapshot.val() || {};
+            for (const firebaseKey in teamsData) {
+                const team = teamsData[firebaseKey];
+                teamsMap[team.id] = team.nombre; // Assuming 'id' is the key in 'equipos' that matches 'equipo_local_id' and 'nombre' holds the team name
+            }
+        }
 
         tableHtml += `<table><thead><tr>`;
-        headers.forEach(header => {
-            tableHtml += `<th>${header}</th>`;
-        });
+        // Encabezados específicos para partidos
+        if (tableName === 'partidos') {
+            dataStructures.partidos.fields.forEach(field => {
+                tableHtml += `<th>${field.label}</th>`;
+            });
+        } else {
+            // Encabezados genéricos para otras tablas
+            const headers = Object.keys(dataArray[0] || {});
+            headers.forEach(header => {
+                tableHtml += `<th>${header}</th>`;
+            });
+        }
         tableHtml += `<th>Acciones</th></tr></thead><tbody>`;
 
         dataArray.forEach(row => {
             tableHtml += `<tr>`;
-            headers.forEach(header => {
-                tableHtml += `<td>${row[header] !== undefined ? row[header] : ''}</td>`;
-            });
+            if (tableName === 'partidos') {
+                dataStructures.partidos.fields.forEach(field => {
+                    let cellValue = row[field.name];
+                    if (field.name === 'equipo_local_id') {
+                        cellValue = teamsMap[row[field.name]] || row[field.name];
+                    } else if (field.name === 'equipo_visitante_id') {
+                        cellValue = teamsMap[row[field.name]] || row[field.name];
+                    }
+                    tableHtml += `<td>${cellValue !== undefined ? cellValue : ''}</td>`;
+                });
+            } else {
+                const headers = Object.keys(row); // Usar las claves de la fila actual
+                headers.forEach(header => {
+                    tableHtml += `<td>${row[header] !== undefined ? row[header] : ''}</td>`;
+                });
+            }
             tableHtml += `
                 <td class="action-buttons">
                     <button class="edit-button" data-id="${row[dataStructures[tableName].idField]}">Editar</button>
