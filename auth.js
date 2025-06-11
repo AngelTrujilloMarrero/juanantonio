@@ -5,9 +5,9 @@ const contentSection = document.getElementById('app-content'); // Ahora apunta a
 const logoutButtonContainer = document.getElementById('logout-button-container');
 const logoutButton = document.getElementById('logout-button');
 const loginErrorMessage = document.getElementById('login-error-message');
-const navElement = document.querySelector('header nav');
-const navLinksElement = document.querySelector('nav .nav-links');
-const homeSummarySection = document.getElementById('home-summary-section'); // Added as it's used below
+const navElement = document.getElementById('main-nav'); // Updated selector
+const navLinksElement = document.querySelector('#main-nav .nav-links'); // Updated selector
+const homeSummarySection = document.getElementById('home-summary-section');
 
 // Manejar el inicio de sesión
 loginForm.addEventListener('submit', (e) => {
@@ -19,7 +19,6 @@ loginForm.addEventListener('submit', (e) => {
         .then((cred) => {
             console.log('Usuario logueado:', cred.user);
             loginErrorMessage.textContent = ''; // Limpia cualquier mensaje de error
-            // Redirige o muestra el contenido principal a través del observador de estado
         })
         .catch((error) => {
             console.error('Error al iniciar sesión:', error.message);
@@ -33,16 +32,15 @@ logoutButton.addEventListener('click', (e) => {
     e.preventDefault();
     auth.signOut().then(() => {
         console.log('Usuario ha cerrado sesión');
-        // Oculta el contenido principal y muestra la sección de login
         contentSection.style.display = 'none';
-        if (navElement) navElement.style.display = 'none';
-        if (navLinksElement) navLinksElement.style.display = 'none';
-        if (navLinksElement) navLinksElement.classList.remove('active');
+        if (navElement) navElement.style.display = 'none'; // Confirmed
+        if (navLinksElement) navLinksElement.style.display = 'none'; // Confirmed
+        if (navLinksElement) navLinksElement.classList.remove('active'); // Confirmed
         loginSection.style.display = 'block';
         logoutButtonContainer.style.display = 'none';
-        loginForm.reset(); // Limpia el formulario de login
-        loginErrorMessage.style.display = 'none'; // Oculta mensajes de error anteriores
-        hideAllContentSections(); // Asegura que todas las secciones de contenido estén ocultas
+        loginForm.reset();
+        loginErrorMessage.style.display = 'none';
+        hideAllContentSections();
     });
 });
 
@@ -55,17 +53,14 @@ document.addEventListener('DOMContentLoaded', () => {
             contentSection.style.display = 'block';
             logoutButtonContainer.style.display = 'block';
             console.log('Usuario actual:', user.email);
-            loginErrorMessage.style.display = 'none'; // Oculta cualquier mensaje de error si el login es exitoso
+            loginErrorMessage.style.display = 'none';
 
-            if (navElement) navElement.style.display = ''; // Let CSS decide
-            if (navLinksElement) navLinksElement.style.display = ''; // Let CSS decide (e.g., flex for nav-links)
+            if (navElement) navElement.style.display = 'block'; // Changed to 'block'
+            if (navLinksElement) navLinksElement.style.display = ''; // Confirmed (let CSS make it flex)
 
-            // Asegúrate de que todas las demás secciones estén ocultas
             hideAllContentSections();
-            // Muestra la sección de resumen de inicio
-            if (homeSummarySection) homeSummarySection.style.display = 'block'; // Check if element exists
-            // Carga los datos de resumen
-            if (typeof loadSummaryData === 'function') { // Asegúrate de que la función exista
+            if (homeSummarySection) homeSummarySection.style.display = 'block';
+            if (typeof loadSummaryData === 'function') {
                 loadSummaryData();
             }
 
@@ -75,9 +70,9 @@ document.addEventListener('DOMContentLoaded', () => {
             contentSection.style.display = 'none';
             logoutButtonContainer.style.display = 'none';
 
-            if (navElement) navElement.style.display = 'none';
-            if (navLinksElement) navLinksElement.style.display = 'none';
-            if (navLinksElement) navLinksElement.classList.remove('active'); // Keep this for mobile menu state
+            if (navElement) navElement.style.display = 'none'; // Confirmed
+            if (navLinksElement) navLinksElement.style.display = 'none'; // Confirmed
+            if (navLinksElement) navLinksElement.classList.remove('active'); // Confirmed
 
             console.log('No hay usuario logueado');
         }
