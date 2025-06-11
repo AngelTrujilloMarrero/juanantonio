@@ -51,7 +51,7 @@ function hideFieldMap() {
 }
 
 // === Funciones para Dibujar el Mapa de Campo ===
-function drawFootballField() {
+async function drawFootballField() {
     // Limpiar el canvas
     ctx.clearRect(0, 0, footballFieldCanvas.width, footballFieldCanvas.height);
 
@@ -106,7 +106,7 @@ function drawFootballField() {
     ctx.stroke();
 
     // Cargar y dibujar acciones desde Firebase
-    loadAndDrawActionsOnField();
+    await loadAndDrawActionsOnField();
 
     if (selectedPoint) {
         const canvasX = (selectedPoint.x / 100) * footballFieldCanvas.width;
@@ -173,7 +173,7 @@ async function loadAndDrawActionsOnField() {
 }
 
 // Event listener para obtener coordenadas al hacer clic en el campo
-footballFieldCanvas.addEventListener('click', (e) => {
+footballFieldCanvas.addEventListener('click', async (e) => { // Make listener async
     const rect = footballFieldCanvas.getBoundingClientRect();
     const clickCanvasX = e.clientX - rect.left;
     const clickCanvasY = e.clientY - rect.top;
@@ -223,7 +223,7 @@ footballFieldCanvas.addEventListener('click', (e) => {
         fieldFormMessage.style.display = 'block';
     }
 
-    drawFootballField(); // Redraw to show selection highlight
+    await drawFootballField(); // Await the drawing
 });
 
 // Event listener para guardar datos de la acción
@@ -289,7 +289,7 @@ fieldDataForm.addEventListener('submit', async (e) => {
         fieldYInput.value = '';
         actionTypeSelect.value = '';
         actionPlayerInput.value = '';
-        drawFootballField(); // Redibujar el campo con la nueva acción
+        await drawFootballField(); // Await the drawing
 
     } catch (error) {
         console.error('Error al guardar acción en Firebase:', error);
@@ -425,12 +425,12 @@ function clearFieldMessage() {
 actionTypeSelect.addEventListener('change', clearFieldMessage);
 actionPlayerInput.addEventListener('input', clearFieldMessage);
 
-showFieldMapButton.addEventListener('click', () => {
+showFieldMapButton.addEventListener('click', async () => { // Make listener async
     destroyChart(); // Ocultar cualquier gráfico existente
     analysisMessage.textContent = '';
     analysisMessage.style.display = 'none';
     fieldMapContainer.style.display = 'block';
-    drawFootballField(); // Asegurarse de que el campo se dibuje correctamente al mostrar
+    await drawFootballField(); // Await the drawing
 });
 
 showGoalsByPlayerChartButton.addEventListener('click', () => {
