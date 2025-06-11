@@ -673,3 +673,52 @@ footer .far {
         grid-template-columns: 1fr;
     }
 }
+
+/* Action History Log Styles */
+#action-history-container {
+    margin-top: 20px; /* Space above the history section */
+    padding: 15px;
+    background-color: #ffffff; /* White background for the container */
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    display: block;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: left; /* Reset text-align for content within this container */
+}
+
+#action-history-container h4 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1.2em;
+    color: #3498db; /* Consistent with other titles */
+    text-align: center;
+}
+
+#action-history-log {
+    list-style-type: none;
+    padding: 10px; /* Padding inside the box */
+    margin: 10px 0 0 0; /* Margin above the box */
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    background-color: #f9f9f9; /* Light background for the log area */
+    border-radius: 4px; /* Slightly rounded corners */
+}
+
+#action-history-log li {
+    padding: 8px 5px; /* Padding for each list item */
+    border-bottom: 1px solid #eee; /* Separator line */
+    font-size: 0.9em;
+    color: #333;
+}
+
+#action-history-log li:last-child {
+    border-bottom: none; /* No border for the last item */
+}
+
+#action-history-log li:hover {
+    background-color: #f0f0f0; /* Subtle hover effect */
+}

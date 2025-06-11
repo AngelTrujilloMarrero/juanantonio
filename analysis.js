@@ -1,5 +1,7 @@
 // js/analysis.js
 let myChartInstance = null; // Para almacenar la instancia del gráfico y destruirla si es necesario
+let selectedPoint = null; // Global variable for selected point
+let drawnActions = []; // Array to store details of actions drawn on canvas
 const fieldMapContainer = document.getElementById('field-map-container');
 const showFieldMapButton = document.getElementById('show-field-map');
 const footballFieldCanvas = document.getElementById('football-field');
@@ -14,6 +16,7 @@ const analysisMessage = document.getElementById('analysis-message');
 const chartArea = document.querySelector('.chart-area');
 const myChartCanvas = document.getElementById('myChart'); // Canvas para los gráficos de Chart.js
 const chartCtx = myChartCanvas.getContext('2d'); // Contexto para Chart.js
+const actionHistoryLog = document.getElementById('action-history-log');
 
 // Nuevos botones de análisis
 const showGoalsByPlayerChartButton = document.getElementById('show-goals-by-player-chart');
@@ -104,49 +107,123 @@ function drawFootballField() {
 
     // Cargar y dibujar acciones desde Firebase
     loadAndDrawActionsOnField();
+
+    if (selectedPoint) {
+        const canvasX = (selectedPoint.x / 100) * footballFieldCanvas.width;
+        const canvasY = (selectedPoint.y / 100) * footballFieldCanvas.height;
+
+        ctx.beginPath();
+        ctx.arc(canvasX, canvasY, 10, 0, 2 * Math.PI); // Larger circle for selection
+        ctx.fillStyle = 'rgba(255, 255, 0, 0.5)'; // Semi-transparent yellow
+        ctx.fill();
+        ctx.strokeStyle = 'yellow';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+    }
 }
 
 async function loadAndDrawActionsOnField() {
     const acciones = await fetchData('acciones');
+    drawnActions = []; // Clear existing drawn actions
 
     acciones.forEach(action => {
         // Mapear coordenadas (0-100) a las dimensiones del canvas
         const canvasX = (action.x / 100) * footballFieldCanvas.width;
         const canvasY = (action.y / 100) * footballFieldCanvas.height;
+        let actionRadius = 4; // Default radius
 
         ctx.beginPath();
         // Diferentes colores/formas según el tipo de acción
         if (action.accion === 'Tiro a Puerta' || action.accion === 'Gol') { // Si 'Gol' es un tipo de acción
             ctx.fillStyle = 'red';
-            ctx.arc(canvasX, canvasY, 8, 0, 2 * Math.PI);
+            actionRadius = 8;
+            ctx.arc(canvasX, canvasY, actionRadius, 0, 2 * Math.PI);
         } else if (action.accion === 'Tiro fuera') {
             ctx.fillStyle = 'orange';
-            ctx.arc(canvasX, canvasY, 7, 0, 2 * Math.PI);
+            actionRadius = 7;
+            ctx.arc(canvasX, canvasY, actionRadius, 0, 2 * Math.PI);
         } else if (action.accion === 'Pase Clave') {
             ctx.fillStyle = 'blue';
-            ctx.arc(canvasX, canvasY, 6, 0, 2 * Math.PI);
+            actionRadius = 6;
+            ctx.arc(canvasX, canvasY, actionRadius, 0, 2 * Math.PI);
         } else if (action.accion === 'Recuperación') {
             ctx.fillStyle = 'green';
-            ctx.rect(canvasX - 5, canvasY - 5, 10, 10); // Cuadrado
+            actionRadius = 5; // Assuming square is drawn from center, radius is half-width
+            ctx.rect(canvasX - actionRadius, canvasY - actionRadius, actionRadius * 2, actionRadius * 2);
         } else if (action.accion === 'Falta') {
             ctx.fillStyle = 'purple';
-            ctx.arc(canvasX, canvasY, 5, 0, 2 * Math.PI);
+            actionRadius = 5;
+            ctx.arc(canvasX, canvasY, actionRadius, 0, 2 * Math.PI);
         } else {
             ctx.fillStyle = 'grey'; // Default para otras acciones
-            ctx.arc(canvasX, canvasY, 4, 0, 2 * Math.PI);
+            actionRadius = 4;
+            ctx.arc(canvasX, canvasY, actionRadius, 0, 2 * Math.PI);
         }
         ctx.fill();
+
+        // Store the action and its drawing details
+        // Make sure to store the original action data from Firebase
+        drawnActions.push({
+            data: action, // This is the original action object from Firebase
+            canvasX: canvasX,
+            canvasY: canvasY,
+            radius: actionRadius + 3 // Add a small buffer for click detection
+        });
     });
 }
 
 // Event listener para obtener coordenadas al hacer clic en el campo
 footballFieldCanvas.addEventListener('click', (e) => {
     const rect = footballFieldCanvas.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width * 100; // Coordenada X en porcentaje (0-100)
-    const y = (e.clientY - rect.top) / rect.height * 100; // Coordenada Y en porcentaje (0-100)
+    const clickCanvasX = e.clientX - rect.left;
+    const clickCanvasY = e.clientY - rect.top;
 
-    fieldXInput.value = x.toFixed(1); // Redondear a un decimal
-    fieldYInput.value = y.toFixed(1);
+    let clickedOnExistingAction = false;
+    for (const drawn_action of drawnActions) {
+        // Calculate distance between click and center of the drawn action
+        const distance = Math.sqrt(
+            Math.pow(clickCanvasX - drawn_action.canvasX, 2) +
+            Math.pow(clickCanvasY - drawn_action.canvasY, 2)
+        );
+
+        if (distance < drawn_action.radius) { // Check if click is within the action's radius
+            const actionData = drawn_action.data;
+            fieldXInput.value = actionData.x.toFixed(1);
+            fieldYInput.value = actionData.y.toFixed(1);
+            actionTypeSelect.value = actionData.accion;
+            actionPlayerInput.value = actionData.jugador_id || '';
+
+            selectedPoint = { x: actionData.x, y: actionData.y }; // Use action's original % coordinates
+
+            // Optional: Display a message or update UI to indicate an existing action is selected
+            fieldFormMessage.textContent = `Acción existente seleccionada: ${actionData.accion}`;
+            fieldFormMessage.style.color = '#3498db'; // Blue color for info
+            fieldFormMessage.style.display = 'block';
+
+            clickedOnExistingAction = true;
+            break;
+        }
+    }
+
+    if (!clickedOnExistingAction) {
+        // Click was not on an existing action, treat as new point
+        const xPercentage = (clickCanvasX / footballFieldCanvas.width) * 100;
+        const yPercentage = (clickCanvasY / footballFieldCanvas.height) * 100;
+
+        fieldXInput.value = xPercentage.toFixed(1);
+        fieldYInput.value = yPercentage.toFixed(1);
+        // Clear other form fields for a new action
+        actionTypeSelect.value = '';
+        actionPlayerInput.value = '';
+
+        selectedPoint = { x: xPercentage, y: yPercentage };
+
+        fieldFormMessage.textContent = 'Nuevo punto seleccionado. Completa los detalles de la acción.';
+        fieldFormMessage.style.color = '#28a745'; // Green
+        fieldFormMessage.style.display = 'block';
+    }
+
+    drawFootballField(); // Redraw to show selection highlight
 });
 
 // Event listener para guardar datos de la acción
@@ -168,14 +245,14 @@ fieldDataForm.addEventListener('submit', async (e) => {
 
     try {
         const newActionRef = database.ref('acciones').push();
-        await newActionRef.set({
-            id: newActionRef.key, // Usar la key generada por Firebase como ID
-            partido_id: null, // Puedes añadir un selector de partido si es necesario
+        const actionToSave = {
+            id: newActionRef.key,
+            partido_id: null,
             jugador_id: playerId,
             accion: actionType,
             x: x,
             y: y,
-            resultado: "", // Puedes añadir un campo para el resultado si es necesario
+            resultado: "",
             ocasion: false,
             finalizador: false,
             blocaje: false,
@@ -192,13 +269,21 @@ fieldDataForm.addEventListener('submit', async (e) => {
             final_blocaje: false,
             portero_corner: false,
             portero_despeje: false,
-            timestamp: firebase.database.ServerValue.TIMESTAMP // Para registrar cuándo se guardó
-        });
+            timestamp: firebase.database.ServerValue.TIMESTAMP
+        };
+        await newActionRef.set(actionToSave);
+
+        const loggedAction = {
+            ...actionToSave,
+            timestamp: Date.now()
+        };
+        updateActionHistoryLog(loggedAction);
 
         fieldFormMessage.textContent = '¡Acción guardada con éxito!';
         fieldFormMessage.style.color = '#28a745'; // Green color
         fieldFormMessage.style.display = 'block';
 
+        selectedPoint = null; // Clear selection
         // Limpiar formulario y campo
         fieldXInput.value = '';
         fieldYInput.value = '';
@@ -216,6 +301,33 @@ fieldDataForm.addEventListener('submit', async (e) => {
 
 
 // === Funciones para Gráficos Dinámicos (Chart.js) ===
+
+function updateActionHistoryLog(actionData) {
+    if (!actionHistoryLog) return;
+
+    const listItem = document.createElement('li');
+
+    // Format timestamp
+    const date = new Date(actionData.timestamp);
+    const formattedTime = date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+    let actionText = `${actionData.accion} (Jugador: ${actionData.jugador_id || 'N/A'})`;
+    if (actionData.x !== undefined && actionData.y !== undefined) {
+        actionText += ` en [${actionData.x.toFixed(1)}, ${actionData.y.toFixed(1)}]`;
+    }
+    actionText += ` - ${formattedTime}`;
+
+    listItem.textContent = actionText;
+
+    // Add to the top of the list
+    actionHistoryLog.prepend(listItem);
+
+    // Optional: Limit the number of history items
+    const maxHistoryItems = 20;
+    if (actionHistoryLog.children.length > maxHistoryItems) {
+        actionHistoryLog.removeChild(actionHistoryLog.lastChild);
+    }
+}
 
 // Gráfico: Goles por Jugador
 async function displayGoalsByPlayerChart() {
@@ -305,6 +417,13 @@ async function displayGoalsByPlayerChart() {
 
 
 // === Event Listeners para los botones de análisis ===
+
+function clearFieldMessage() {
+    fieldFormMessage.textContent = '';
+    fieldFormMessage.style.display = 'none';
+}
+actionTypeSelect.addEventListener('change', clearFieldMessage);
+actionPlayerInput.addEventListener('input', clearFieldMessage);
 
 showFieldMapButton.addEventListener('click', () => {
     destroyChart(); // Ocultar cualquier gráfico existente
