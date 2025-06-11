@@ -7,7 +7,7 @@ const logoutButton = document.getElementById('logout-button');
 const loginErrorMessage = document.getElementById('login-error-message');
 const navElement = document.querySelector('header nav');
 const navLinksElement = document.querySelector('nav .nav-links');
-
+const homeSummarySection = document.getElementById('home-summary-section'); // Added as it's used below
 
 // Manejar el inicio de sesión
 loginForm.addEventListener('submit', (e) => {
@@ -35,10 +35,9 @@ logoutButton.addEventListener('click', (e) => {
         console.log('Usuario ha cerrado sesión');
         // Oculta el contenido principal y muestra la sección de login
         contentSection.style.display = 'none';
-        if (navElement) navElement.classList.add('hidden-menu');
-        if (navLinksElement) navLinksElement.classList.add('hidden-menu');
+        if (navElement) navElement.style.display = 'none';
+        if (navLinksElement) navLinksElement.style.display = 'none';
         if (navLinksElement) navLinksElement.classList.remove('active');
-        if (navLinksElement) navLinksElement.classList.add('debug-menu-hidden-state');
         loginSection.style.display = 'block';
         logoutButtonContainer.style.display = 'none';
         loginForm.reset(); // Limpia el formulario de login
@@ -47,36 +46,40 @@ logoutButton.addEventListener('click', (e) => {
     });
 });
 
-// Observador de estado de autenticación de Firebase
-auth.onAuthStateChanged((user) => {
-    if (user) {
-        // Usuario logueado
-        loginSection.style.display = 'none';
-        contentSection.style.display = 'block';
-        logoutButtonContainer.style.display = 'block';
-        console.log('Usuario actual:', user.email);
-        loginErrorMessage.style.display = 'none'; // Oculta cualquier mensaje de error si el login es exitoso
+// Observador de estado de autenticación de Firebase, envuelto en DOMContentLoaded
+document.addEventListener('DOMContentLoaded', () => {
+    auth.onAuthStateChanged((user) => {
+        if (user) {
+            // Usuario logueado
+            loginSection.style.display = 'none';
+            contentSection.style.display = 'block';
+            logoutButtonContainer.style.display = 'block';
+            console.log('Usuario actual:', user.email);
+            loginErrorMessage.style.display = 'none'; // Oculta cualquier mensaje de error si el login es exitoso
 
-        // Asegúrate de que todas las demás secciones estén ocultas
-        hideAllContentSections();
-        // Muestra la sección de resumen de inicio
-        homeSummarySection.style.display = 'block';
-        // Carga los datos de resumen
-        if (typeof loadSummaryData === 'function') { // Asegúrate de que la función exista
-            loadSummaryData();
+            if (navElement) navElement.style.display = ''; // Let CSS decide
+            if (navLinksElement) navLinksElement.style.display = ''; // Let CSS decide (e.g., flex for nav-links)
+
+            // Asegúrate de que todas las demás secciones estén ocultas
+            hideAllContentSections();
+            // Muestra la sección de resumen de inicio
+            if (homeSummarySection) homeSummarySection.style.display = 'block'; // Check if element exists
+            // Carga los datos de resumen
+            if (typeof loadSummaryData === 'function') { // Asegúrate de que la función exista
+                loadSummaryData();
+            }
+
+        } else {
+            // Usuario no logueado
+            loginSection.style.display = 'block';
+            contentSection.style.display = 'none';
+            logoutButtonContainer.style.display = 'none';
+
+            if (navElement) navElement.style.display = 'none';
+            if (navLinksElement) navLinksElement.style.display = 'none';
+            if (navLinksElement) navLinksElement.classList.remove('active'); // Keep this for mobile menu state
+
+            console.log('No hay usuario logueado');
         }
-        if (navElement) navElement.classList.remove('hidden-menu');
-        if (navLinksElement) navLinksElement.classList.remove('hidden-menu');
-
-    } else {
-        // Usuario no logueado
-        loginSection.style.display = 'block';
-        contentSection.style.display = 'none';
-        logoutButtonContainer.style.display = 'none';
-        if (navElement) navElement.classList.add('hidden-menu');
-        if (navLinksElement) navLinksElement.classList.add('hidden-menu');
-        if (navLinksElement) navLinksElement.classList.remove('active');
-        if (navLinksElement) navLinksElement.classList.add('debug-menu-hidden-state');
-        console.log('No hay usuario logueado');
-    }
+    });
 });

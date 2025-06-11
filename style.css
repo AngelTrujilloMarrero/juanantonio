@@ -673,13 +673,3 @@ footer .far {
         grid-template-columns: 1fr;
     }
 }
-
-.hidden-menu {
-    display: none !important;
-}
-
-.debug-menu-hidden-state {
-    background-color: red !important;
-    border: 5px solid yellow !important;
-    color: white !important; /* To make text visible against red background */
-}
